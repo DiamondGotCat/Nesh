@@ -70,5 +70,9 @@
     "unsupported_language": {
         "ENGLISH": "Unsupported language: {language}. Defaulting to ENGLISH.",
         "日本語": "サポートされていない言語: {language}. デフォルトを英語に設定します。"
+    },
+    "config_refreshed": {
+        "ENGLISH": "Configuration file reloaded successfully.",
+        "日本語": "設定ファイルが正常に再読み込みされました。"
     }
 }
