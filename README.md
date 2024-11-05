@@ -11,7 +11,7 @@ A new shell that can run regular commands (`/bin/sh`) as well as Nesh Scripts.
 |              | `CMD`              | `FROM "<path>"`             | Loads commands from an external file at the given path.                                           |
 | **APPEND**   |                    | `"<value>" TO $VAR_NAME`    | Appends a value to an existing variable.                                                          |
 | **SET**      | `LANGUAGE`         | `"<language>"`              | Sets the language of the shell (options: `"ENGLISH"`, `"日本語"`).                                 |
-|              | `VAR`              | `$VAR_NAME WITH TYPE VALUE` | Sets an existing variable’s value with specific type (`BOOL`, `OPTION`, `TEXT`).                  |
+|              | `VAR`              | `$VAR_NAME WITH TYPE VALUE` | Sets an existing variable’s value with specific type (`BOOL`, `OPTION`).                          |
 | **RUN**      | `CMD`              | `"<command>"`               | Runs a specified command and captures its output.                                                 |
 |              | `NESH`             | `FROM "<file_path>"`        | Runs commands from a specified Nesh script file.                                                  |
 | **SAVE**     |                    | `"<output_file>"`           | Saves the last command result to a specified file path.                                           |
