@@ -286,6 +286,7 @@ class Nesh:
             sys.exit(1)
 
     def load_rc(self):
+        self.environment.clear()
         parser = NeshScriptParser(CONFIG_RC)
         parser.execute(self)
 
@@ -307,7 +308,7 @@ class Nesh:
             print(message_template.format(**kwargs))
         else:
             fallback = self.messages.get(message_key, {}).get("ENGLISH", "")
-            print(fallback)
+            print(fallback.format(**kwargs))
 
     def load_commands(self):
         if os.path.exists(CONFIG_COMMANDS):
