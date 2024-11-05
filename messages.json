@@ -1,0 +1,74 @@
+{
+    "command_not_found": {
+        "ENGLISH": "Command '{cmd}' not found.",
+        "日本語": "コマンド '{cmd}' が見つかりません。"
+    },
+    "suggest_command": {
+        "ENGLISH": "Do you want to execute '{suggestion}' instead? [y/N]",
+        "日本語": "代わりに '{suggestion}' を実行しますか？ [y/N]"
+    },
+    "directory_created": {
+        "ENGLISH": "Directory created: {path}",
+        "日本語": "ディレクトリを作成しました: {path}"
+    },
+    "variable_set": {
+        "ENGLISH": "Environment variable set: {var} = {value}",
+        "日本語": "環境変数を設定: {var} = {value}"
+    },
+    "alias_created": {
+        "ENGLISH": "Alias created: {alias} = {command}",
+        "日本語": "エイリアスを作成: {alias} = {command}"
+    },
+    "external_commands_loaded": {
+        "ENGLISH": "External commands loaded from: {path}",
+        "日本語": "外部コマンドを読み込みました: {path}"
+    },
+    "script_not_found": {
+        "ENGLISH": "Nesh Script file not found: {path}",
+        "日本語": "Nesh Scriptファイルが見つかりません: {path}"
+    },
+    "script_parse_error": {
+        "ENGLISH": "Nesh Script parse error: {error} | Line: {line}",
+        "日本語": "Nesh Script解析エラー: {error} | 行: {line}"
+    },
+    "command_execution_error": {
+        "ENGLISH": "Command execution error: {error}",
+        "日本語": "コマンド実行エラー: {error}"
+    },
+    "prompt": {
+        "ENGLISH": "nesh> ",
+        "日本語": "nesh> "
+    },
+    "exit_message": {
+        "ENGLISH": "Exiting.",
+        "日本語": "終了します。"
+    },
+    "create_command_error": {
+        "ENGLISH": "Unknown CREATE subcommand: {sub_command}",
+        "日本語": "未知のCREATEサブコマンド: {sub_command}"
+    },
+    "unknown_command": {
+        "ENGLISH": "Unknown command: {command}",
+        "日本語": "未知のコマンド: {command}"
+    },
+    "run_cmd_executed": {
+        "ENGLISH": "Executed RUN CMD: {cmd}",
+        "日本語": "RUN CMDを実行しました: {cmd}"
+    },
+    "run_nesh_executed": {
+        "ENGLISH": "Executed RUN NESH FROM FILE: {path}",
+        "日本語": "RUN NESH FROM FILEを実行しました: {path}"
+    },
+    "save_preview_result": {
+        "ENGLISH": "Saved preview result to: {path}",
+        "日本語": "プレビュー結果を保存しました: {path}"
+    },
+    "sleep_executed": {
+        "ENGLISH": "Slept for {seconds} second(s).",
+        "日本語": "{seconds}秒間スリープしました。"
+    },
+    "unsupported_language": {
+        "ENGLISH": "Unsupported language: {language}. Defaulting to ENGLISH.",
+        "日本語": "サポートされていない言語: {language}. デフォルトを英語に設定します。"
+    }
+}

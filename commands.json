@@ -1,0 +1,24 @@
+{
+    "commands": {
+        "ls": {
+            "description": "List directory contents.",
+            "arguments": ["-l", "-a", "-h", "--color"]
+        },
+        "cd": {
+            "description": "Change the shell working directory.",
+            "arguments": []
+        },
+        "git": {
+            "description": "Git",
+            "arguments": ["status", "commit", "push", "pull", "clone"]
+        },
+        "echo": {
+            "description": "Show Text",
+            "arguments": []
+        },
+        "pwd": {
+            "description": "Show Text",
+            "arguments": []
+        }
+    }
+}
