@@ -1,5 +1,5 @@
 # Nesh
-`Next Shell` and `Nesh Script`
+A new shell that can run regular commands (/bin/sh) as well as Nesh Scripts.
 
 ## Nesh Script
 
