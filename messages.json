@@ -36,8 +36,8 @@
         "日本語": "コマンド実行エラー: {error}"
     },
     "prompt": {
-        "ENGLISH": "nesh> ",
-        "日本語": "nesh> "
+        "ENGLISH": "NESH> ",
+        "日本語": "NESH> "
     },
     "exit_message": {
         "ENGLISH": "Exiting.",
