@@ -7,7 +7,11 @@ import difflib
 import shlex
 import sys
 import time
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.markdown import Table
 
+console = Console()
 CONFIG_RC = os.path.expanduser("~/.neshrc")
 CONFIG_COMMANDS = os.path.expanduser("~/.nesh/commands.json")
 CONFIG_MESSAGES = os.path.expanduser("~/.nesh/messages.json")
@@ -84,6 +88,29 @@ class NeshScriptParser:
         elif command == "REFLESH":
             shell.load_rc()
             shell.print_message("config_refreshed")
+        elif command == "HELP":
+            table = Table(title="Nesh Help")
+
+            table.add_column("Command", style="cyan", no_wrap=True)
+            table.add_column("Subcommand", style="magenta")
+            table.add_column("Parameters", style="green")
+            table.add_column("Description", style="yellow", width=77)
+
+            table.add_row("CREATE", "DIR", '"<directory_path>"', "Creates a directory at the specified path.")
+            table.add_row("CREATE", "VAR", "$VAR_NAME WITH TYPE VALUE", "Creates a variable with a specific type (`TEXT`, `BOOL`, `OPTION`) and value.")
+            table.add_row("CREATE", "ALIAS", 'ALIAS FOR "<command>"', "Creates an alias that maps to a specified command.")
+            table.add_row("CREATE", "CMD", 'FROM "<path>"', "Loads commands from an external file at the given path.")
+            table.add_row("APPEND", "", '"<value>" TO $VAR_NAME', "Appends a value to an existing variable.")
+            table.add_row("SET", "LANGUAGE", '"<language>"', 'Sets the language of the shell (options: `"ENGLISH"`, `"日本語"`).')
+            table.add_row("SET", "VAR", "$VAR_NAME WITH TYPE VALUE", "Sets an existing variable’s value with specific type (`BOOL`, `OPTION`).")
+            table.add_row("RUN", "CMD", '"<command>"', "Runs a specified command and captures its output.")
+            table.add_row("RUN", "NESH", 'FROM "<file_path>"', "Runs commands from a specified Nesh script file.")
+            table.add_row("SAVE", "", '"<output_file>"', "Saves the last command result to a specified file path.")
+            table.add_row("EXIT", "", "", "Exits the shell.")
+            table.add_row("SLEEP", "", 'WITH SECOND <seconds>', "Pauses execution for a specified number of seconds.")
+            table.add_row("REFLESH", "", "", "Reloads the configuration from `~/.neshrc`.")
+
+            console.print(table)
         else:
             shell.print_message("unknown_command", command=command)
 
@@ -305,10 +332,10 @@ class Nesh:
     def print_message(self, message_key, **kwargs):
         message_template = self.messages.get(message_key, {}).get(self.language, "")
         if message_template:
-            print(message_template.format(**kwargs))
+            console.print(Markdown(message_template.format(**kwargs)))
         else:
             fallback = self.messages.get(message_key, {}).get("ENGLISH", "")
-            print(fallback.format(**kwargs))
+            console.print(Markdown(fallback.format(**kwargs)))
 
     def load_commands(self):
         if os.path.exists(CONFIG_COMMANDS):
@@ -388,7 +415,7 @@ class Nesh:
             # Replace the command line with the expanded alias
             cmd_line = self.aliases[first_word] + ' ' + ' '.join(tokens[1:])
 
-        nesh_commands = ["CREATE", "APPEND", "SET", "RUN", "SAVE", "EXIT", "SLEEP", "REFLESH"]
+        nesh_commands = ["CREATE", "APPEND", "SET", "RUN", "SAVE", "EXIT", "SLEEP", "REFLESH", "HELP"]
 
         if first_word in nesh_commands:
             parser = NeshScriptParser("")
