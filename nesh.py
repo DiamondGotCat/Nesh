@@ -19,6 +19,7 @@ class NeshScriptParser:
         self.language = "ENGLISH"  # Default language
 
     def parse_line(self, line, shell):
+        line = self.expand_variables(line, shell)  # Expand variables in the line
         line = line.strip()
         if not line or line.startswith("#"):
             return  # Ignore comments and empty lines
@@ -40,7 +41,6 @@ class NeshScriptParser:
                 if alias_cmd is not None:
                     shell.aliases[alias_name] = alias_cmd
             elif sub_command == "CMD":
-                # CREATE CMD FROM "path/to/external.json"
                 from_index = line.upper().find('FROM')
                 if from_index == -1:
                     shell.print_message("script_parse_error", error="Missing FROM keyword", line=line)
@@ -50,7 +50,6 @@ class NeshScriptParser:
             else:
                 shell.print_message("create_command_error", sub_command=sub_command)
         elif command == "APPEND":
-            # APPEND "value" TO $VAR_NAME
             self.append_to_var(line, shell)
         elif command == "SET":
             sub_command = tokens[1].upper()
@@ -58,7 +57,6 @@ class NeshScriptParser:
                 language = self._extract_quoted_string(line)
                 shell.set_language(language)
             elif sub_command == "VAR":
-                # SET VAR $VARIABLE WITH TYPE VALUE
                 self.set_var(line, shell)
             else:
                 shell.print_message("unknown_command", command=command)
@@ -68,7 +66,6 @@ class NeshScriptParser:
                 cmd = self._extract_quoted_string(line)
                 self.run_cmd(cmd, shell)
             elif sub_command == "NESH":
-                # RUN NESH FROM FILE "path/to/file.nesh"
                 from_index = line.upper().find('FROM')
                 if from_index == -1:
                     shell.print_message("script_parse_error", error="Missing FROM keyword", line=line)
@@ -78,16 +75,21 @@ class NeshScriptParser:
             else:
                 shell.print_message("unknown_command", command=command)
         elif command == "SAVE":
-            # SAVE PREVIEW RESULT TO FILE "path/to/log.txt"
             self.save_preview_result(line, shell)
         elif command == "EXIT":
             shell.print_message("exit_message")
             shell.exit_shell()
         elif command == "SLEEP":
-            # SLEEP WITH SECOND 1
             self.sleep_command(line, shell)
         else:
             shell.print_message("unknown_command", command=command)
+
+    def expand_variables(self, text, shell):
+        # Expand variables in the format $VAR_NAME or ${VAR_NAME}
+        for key, value in shell.environment.items():
+            text = text.replace(f"${{{key}}}", str(value))
+            text = text.replace(f"${key}", str(value))
+        return text
 
     def _extract_quoted_string(self, text):
         first_quote = text.find('"')
@@ -105,17 +107,14 @@ class NeshScriptParser:
             shell.print_message("command_execution_error", error=e)
 
     def create_var(self, line, shell):
-        # CREATE VAR $VAR_NAME WITH TYPE VALUE
         try:
             parts = shlex.split(line)
             var_index = parts.index("VAR") + 1
             with_index = parts.index("WITH") + 1
-            type_index = with_index  # Corrected indexing
-            value_index = with_index + 1  # Corrected indexing
+            type_index = with_index
+            value_index = with_index + 1
 
-            var_name = parts[var_index]
-            var_name = var_name.strip('$')
-
+            var_name = parts[var_index].strip('$')
             var_type = parts[type_index].upper()
             if var_type == "TEXT":
                 value = self._extract_quoted_string(line)
@@ -127,7 +126,6 @@ class NeshScriptParser:
                 value = True if value_str == "TRUE" else False
             elif var_type == "OPTION":
                 value = parts[value_index].upper()
-                # Optionally validate the option value
             else:
                 shell.print_message("script_parse_error", error=f"Unsupported VAR type: {var_type}", line=line)
                 return var_name, None
@@ -139,14 +137,12 @@ class NeshScriptParser:
             return var_name if 'var_name' in locals() else None, None
 
     def create_alias(self, line, shell):
-        # CREATE ALIAS alias_name FOR "command"
         try:
             parts = shlex.split(line)
             alias_index = parts.index("ALIAS") + 1
             for_index = parts.index("FOR") + 1
 
             alias_name = parts[alias_index]
-            # Extract command between FOR and end
             for_pos = line.upper().find('FOR')
             alias_cmd = self._extract_quoted_string(line[for_pos:])
             shell.print_message("alias_created", alias=alias_name, command=alias_cmd)
@@ -156,7 +152,6 @@ class NeshScriptParser:
             return None, None
 
     def append_to_var(self, line, shell):
-        # APPEND "value" TO $VAR_NAME
         try:
             parts = shlex.split(line)
             append_index = parts.index("APPEND") + 1
@@ -180,7 +175,6 @@ class NeshScriptParser:
             shell.print_message("script_parse_error", error=str(e), line=line)
 
     def set_var(self, line, shell):
-        # SET VAR $VARIABLE WITH TYPE VALUE
         try:
             parts = shlex.split(line)
             var_index = parts.index("VAR") + 1
@@ -196,8 +190,7 @@ class NeshScriptParser:
                     return
                 var_value = True if value == "TRUE" else False
             elif type_or_option == "OPTION":
-                var_value = value  # e.g., IN_PROMPT
-                # Optionally validate the option value
+                var_value = value
             else:
                 shell.print_message("script_parse_error", error=f"Unsupported SET VAR type: {type_or_option}", line=line)
                 return
@@ -208,6 +201,7 @@ class NeshScriptParser:
             shell.print_message("script_parse_error", error=str(e), line=line)
 
     def run_cmd(self, cmd, shell):
+        cmd = self.expand_variables(cmd, shell)  # Expand variables in the command
         shell.print_message("run_cmd_executed", cmd=cmd)
         try:
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True, env=shell.get_environment())
@@ -222,11 +216,10 @@ class NeshScriptParser:
     def run_nesh_from_file(self, path, shell):
         shell.print_message("run_nesh_executed", path=path)
         parser = NeshScriptParser(os.path.expanduser(path))
-        parser.language = shell.language  # Inherit language setting
+        parser.language = shell.language
         parser.execute(shell)
 
     def save_preview_result(self, line, shell):
-        # SAVE PREVIEW RESULT TO FILE "path/to/log.txt"
         try:
             parts = shlex.split(line)
             to_index = parts.index("TO") + 1
@@ -241,7 +234,6 @@ class NeshScriptParser:
             shell.print_message("script_parse_error", error=str(e), line=line)
 
     def sleep_command(self, line, shell):
-        # SLEEP WITH SECOND 1
         try:
             parts = shlex.split(line)
             with_index = parts.index("WITH") + 1
@@ -270,7 +262,7 @@ class Nesh:
         self.commands = {}
         self.aliases = {}
         self.environment = {}
-        self.language = "ENGLISH"  # Default language
+        self.language = "ENGLISH"
         self.last_command_result = ""
         self.messages = self.load_messages()
         self.load_commands()
@@ -311,7 +303,6 @@ class Nesh:
         if message_template:
             print(message_template.format(**kwargs))
         else:
-            # Fallback to English if the message key or language is not found
             fallback = self.messages.get(message_key, {}).get("ENGLISH", "")
             print(fallback)
 
@@ -356,7 +347,6 @@ class Nesh:
         try:
             tokens = shlex.split(buffer)
         except ValueError:
-            # Handle unbalanced quotes
             tokens = buffer.split()
 
         if not tokens:
@@ -385,23 +375,18 @@ class Nesh:
         if not cmd_line.strip():
             return
 
-        # Determine if the command is a Nesh Script command
         first_word = cmd_line.strip().split()[0].upper()
         nesh_commands = ["CREATE", "APPEND", "SET", "RUN", "SAVE", "EXIT", "SLEEP"]
 
         if first_word in nesh_commands:
-            # Treat as Nesh Script command
-            parser = NeshScriptParser("")  # Empty filepath since we're parsing a single line
-            parser.filepath = ""  # Not using a file
-            # Parse and execute the single line
+            parser = NeshScriptParser("")
+            parser.filepath = ""
             try:
                 parser.parse_line(cmd_line, self)
             except Exception as e:
                 self.print_message("script_parse_error", error=str(e), line=cmd_line)
         else:
-            # Treat as a regular shell command
             try:
-                # Update environment variables
                 env = self.get_environment()
                 result = subprocess.run(cmd_line, shell=True, capture_output=True, text=True, env=env)
                 self.last_command_result = result.stdout.strip()
@@ -421,7 +406,6 @@ class Nesh:
         while True:
             try:
                 prompt = self.messages["prompt"].get(self.language, "nesh> ")
-                # Modify prompt based on $NESH_PWD_SHOW
                 if self.environment.get("NESH_PWD_SHOW") == "IN_PROMPT":
                     pwd = os.getcwd()
                     prompt = f"{pwd} {prompt}"
