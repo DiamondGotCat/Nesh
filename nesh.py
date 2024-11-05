@@ -81,6 +81,9 @@ class NeshScriptParser:
             shell.exit_shell()
         elif command == "SLEEP":
             self.sleep_command(line, shell)
+        elif command == "REFLESH":
+            shell.load_rc()
+            shell.print_message("config_refreshed")
         else:
             shell.print_message("unknown_command", command=command)
 
@@ -375,8 +378,16 @@ class Nesh:
         if not cmd_line.strip():
             return
 
-        first_word = cmd_line.strip().split()[0].upper()
-        nesh_commands = ["CREATE", "APPEND", "SET", "RUN", "SAVE", "EXIT", "SLEEP"]
+        # Split the command line into tokens and get the first token as the command
+        tokens = cmd_line.strip().split()
+        first_word = tokens[0].upper()
+
+        # Check if the first word is an alias
+        if first_word in self.aliases:
+            # Replace the command line with the expanded alias
+            cmd_line = self.aliases[first_word] + ' ' + ' '.join(tokens[1:])
+
+        nesh_commands = ["CREATE", "APPEND", "SET", "RUN", "SAVE", "EXIT", "SLEEP", "REFLESH"]
 
         if first_word in nesh_commands:
             parser = NeshScriptParser("")
